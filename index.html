@@ -1,0 +1,228 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spartle</title>
+</head>
+<body>
+    <h1><s>word</s>le</h1>
+    <div id="game"></div>
+    <h1 id="message" hidden>Message!</h1>
+    <button id="restart">Restart</button>
+    <script type="module">
+        const message = document.getElementById("message")
+        const restart = document.getElementById("restart")
+        let writerow = 1
+        let writecolumn = 0
+        let won = false
+        let word = "tests".toUpperCase()
+
+        function reset() {
+            writerow = 1
+            writecolumn = 0
+            won = false
+            word = "tests".toUpperCase()
+            message.hidden = true
+            restart.hidden = true
+            // const toDelete = document.querySelectorAll(".row")
+
+            // for (let i = 0; i < toDelete.length; i++) {
+            //     document.removeChild(toDelete[i])
+            // }
+            document.body.children.game.innerHTML = ""
+            for (let i = 1; i < 6; i++) {
+                const e = document.createElement("div")
+                e.className = "row"
+                e.id = String(i)
+                for (let j = 0; j < 5; j++) {
+                    const b = document.createElement("p")
+                    b.className = "default"
+                    b.style.margin = "0.2vw"
+                    b.style.width = "4vw"
+                    b.style.height = "4vw"
+                    b.style.color = "white"
+                    b.style.lineHeight = "4vw"
+                    b.style.fontSize = "2vw"
+                    e.appendChild(b)
+                }
+
+                document.body.children.game.appendChild(e)
+            }
+        }
+        
+        let characters = []
+        for (let i = 65; i < (65 + 26); i++) {
+            characters.push(String.fromCharCode(i)) // lazy
+        }
+        console.log(characters)
+
+        reset()
+
+        restart.addEventListener("click",reset)
+        document.addEventListener("keydown", (e) => {
+            if (won || writerow > 5) return
+            const row = document.getElementById(String(writerow)) 
+
+            if (e.key == "Backspace" && writecolumn > 0) {
+                row.children[writecolumn-1].innerHTML = ""
+                row.children[writecolumn-1].className = "default"
+                writecolumn -= 1
+                writecolumn = Math.max(writecolumn,0)
+                return
+            }
+            const l = e.key.toUpperCase()
+            console.log(e.key, characters)
+            if (!characters.includes(l)) {
+                return
+            }
+            
+            const el = row.children[writecolumn]
+            
+            el.innerHTML = l
+            el.className = "unchecked"
+            
+            writecolumn++
+            if (writecolumn > 4) { // finished answer
+                let full = ""
+                for (let i = 0; i < 5; i++) {
+                    console.log(word.charAt(i),row.children[i].innerHTML)
+                    if (word.charAt(i) === row.children[i].innerHTML) { // match, yippee!
+                        row.children[i].className = "correct"
+                    }
+                    else if (word.includes(row.children[i].innerHTML)) {
+                        row.children[i].className = "close"
+                    }
+                    else {
+                        row.children[i].className = "incorrect"
+                    }
+                    full += row.children[i].innerHTML
+                }
+
+                if (full == word) {
+                    won = true
+                    
+                    message.innerHTML = `You guessed the word in ${writerow} guesses!`
+                    message.style.color = "var(--yellow)"
+                    message.hidden = false
+                    restart.hidden = false
+                }
+                
+                writerow++
+                writecolumn = 0
+                if (writerow > 5) { // things go here
+                    message.innerHTML = `You didn't guess the word, it was ${word}.`
+                    message.style.color = "var(--red)"
+                    message.hidden = false
+                    restart.hidden = false
+                }
+            }
+        })
+
+    </script>
+    <style>
+        body {
+            background-color: rgb(4, 4, 50);
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bolder;
+            text-align: center;
+        }
+
+        #message {
+            --yellow: rgb(212, 206, 24);
+            --red: rgb(212, 24, 24);
+            color: var(--yellow);
+        }
+
+        h1, h3 {
+            color: white;
+        }
+
+        .row {
+            display: flex;
+            padding-bottom: 0.2vw;
+            text-align: center;
+            margin: auto;
+            width: fit-content;
+            justify-content: center;
+            
+        }
+
+        /* p {
+            margin: 0.2vw;
+            width: 5vw;
+            height: 5vw;
+            color: white; 
+        } */
+
+        p.unchecked {
+            background-color: rgb(77, 77, 77);
+            border: solid;
+            border-width: 0.25vw;
+            border-color: rgb(100, 100, 100);
+            border-radius: 0.25vw;
+            
+        }
+
+        p.default {
+            background-color: rgb(95, 95, 95);
+            border: solid;
+            border-width: 0.25vw;
+            border-color: rgb(115, 115, 115);
+            border-radius: 0.25vw;
+            
+        }
+
+        p.correct {
+            background-color: rgb(28, 181, 33);
+            border: solid;
+            border-width: 0.25vw;
+            border-color: rgb(28, 181, 33);
+            border-radius: 0.25vw;
+            
+        }
+
+        p.close {
+            background-color: rgb(212, 206, 24);
+            border: solid;
+            border-width: 0.25vw;
+            border-color: rgb(212, 206, 24);
+            border-radius: 0.25vw;
+            
+        }
+
+        p.incorrect {
+            background-color: rgb(65, 58, 58);
+            border: solid;
+            border-width: 0.25vw;
+            border-color: rgb(65, 58, 58);
+            border-radius: 0.25vw;
+            
+        }
+
+        button {
+            --c: 80;
+            background-color: rgb(var(--c), var(--c), var(--c));
+            margin-top: 2vw;
+            width: 8vw;
+            height: 3vw;
+            border: solid;
+            border-color: rgb(calc(var(--c) - 10), calc(var(--c) - 10), calc(var(--c) - 10));
+            border-width: 0.25vw;
+            border-radius: 0.25vw;
+        }
+        button:hover {
+            background-color: rgb(calc(var(--c) - 5), calc(var(--c) - 5), calc(var(--c) - 5));
+            border-color: rgb(calc(var(--c) - 15), calc(var(--c) - 15), calc(var(--c) - 15));
+            border-width: 0.25vw;
+            border-radius: 0.25vw;
+        }
+
+        button:active {
+            background-color: rgb(calc(var(--c) - 20), calc(var(--c) - 20), calc(var(--c) - 20));
+            border-color: rgb(calc(var(--c) - 25), calc(var(--c) - 25), calc(var(--c) - 25 ));
+            border-width: 0.25vw;
+            border-radius: 0.25vw;
+        }
+    </style>
+</body>
+</html>

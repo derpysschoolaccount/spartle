@@ -5,7 +5,7 @@
     <title>Spartle</title>
 </head>
 <body>
-    <h1><s>word</s>le</h1>
+    <h1><s>word</s>spartle</h1>
     <div id="game"></div>
     <h1 id="message" hidden>Message!</h1>
     <button id="restart">Restart</button>
@@ -15,13 +15,14 @@
         let writerow = 1
         let writecolumn = 0
         let won = false
-        let word = "tests".toUpperCase()
+        let word = "skibidi"
 
-        function reset() {
+        async function reset() {
             writerow = 1
             writecolumn = 0
             won = false
-            word = "tests".toUpperCase()
+            
+            word = (await (await fetch("https://thankful-bass-caring.ngrok-free.app/wordle", {headers: {"ngrok-skip-browser-warning": true}})).text()).toUpperCase()
             message.hidden = true
             restart.hidden = true
             // const toDelete = document.querySelectorAll(".row")
@@ -54,15 +55,15 @@
         for (let i = 65; i < (65 + 26); i++) {
             characters.push(String.fromCharCode(i)) // lazy
         }
-        console.log(characters)
+        //console.log(characters)
 
-        reset()
+        await reset()
 
         restart.addEventListener("click",reset)
-        document.addEventListener("keydown", (e) => {
+        document.addEventListener("keydown", async (e) => {
             if (won || writerow > 5) return
             const row = document.getElementById(String(writerow)) 
-
+            const enter = e.key == "Enter"
             if (e.key == "Backspace" && writecolumn > 0) {
                 row.children[writecolumn-1].innerHTML = ""
                 row.children[writecolumn-1].className = "default"
@@ -70,22 +71,48 @@
                 writecolumn = Math.max(writecolumn,0)
                 return
             }
-            const l = e.key.toUpperCase()
-            console.log(e.key, characters)
-            if (!characters.includes(l)) {
+            else if (writecolumn > 4 && !enter) {
                 return
             }
+            if (!enter) {
+                const l = e.key.toUpperCase()
+                if (!characters.includes(l)) {
+                    return
+                }
+                
+                const el = row.children[writecolumn]
+                el.innerHTML = l
+                el.className = "unchecked"
+                
+                writecolumn++
+            }
             
-            const el = row.children[writecolumn]
-            
-            el.innerHTML = l
-            el.className = "unchecked"
-            
-            writecolumn++
-            if (writecolumn > 4) { // finished answer
+            if (writecolumn > 4 && enter) { // finished answer
+                
                 let full = ""
                 for (let i = 0; i < 5; i++) {
-                    console.log(word.charAt(i),row.children[i].innerHTML)
+                    full += row.children[i].innerHTML
+                }
+
+                message.hidden = true
+                // https://thankful-bass-caring.ngrok-free.app/wordle
+                const r = await (await fetch("https://thankful-bass-caring.ngrok-free.app/wordle/valid", { headers: { "ngrok-skip-browser-warning": true, "Content-Type": "application/json" }, body: JSON.stringify({ word: full.toLowerCase() }), method: "POST" })).text()
+                if (r != "true") {
+                    message.innerHTML = `Word "${full}" not in the word list.`
+                    message.style.color = "var(--yellow)"
+                    message.hidden = false
+                    new Promise((resolve) => {
+                        setTimeout(resolve, 3500)
+                    }).then((v) => {
+                        if (message.innerHTML == "Word not in the word list." && !message.hidden) {
+                            message.hidden = true
+                        }
+                    })
+                    return
+                }
+
+                for (let i = 0; i < 5; i++) {
+                    //console.log(word.charAt(i),row.children[i].innerHTML)
                     if (word.charAt(i) === row.children[i].innerHTML) { // match, yippee!
                         row.children[i].className = "correct"
                     }
@@ -95,7 +122,6 @@
                     else {
                         row.children[i].className = "incorrect"
                     }
-                    full += row.children[i].innerHTML
                 }
 
                 if (full == word) {
@@ -209,6 +235,7 @@
             border-color: rgb(calc(var(--c) - 10), calc(var(--c) - 10), calc(var(--c) - 10));
             border-width: 0.25vw;
             border-radius: 0.25vw;
+            font-size: 1vw;
         }
         button:hover {
             background-color: rgb(calc(var(--c) - 5), calc(var(--c) - 5), calc(var(--c) - 5));

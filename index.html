@@ -99,7 +99,7 @@
                 const r = await (await fetch("https://thankful-bass-caring.ngrok-free.app/wordle/valid", { headers: { "ngrok-skip-browser-warning": true, "Content-Type": "application/json" }, body: JSON.stringify({ word: full.toLowerCase() }), method: "POST" })).text()
                 if (r != "true") {
                     message.innerHTML = `Word "${full}" not in the word list.`
-                    message.style.color = "var(--yellow)"
+                    message.style.color = "rgb(212, 206, 24)"
                     message.hidden = false
                     new Promise((resolve) => {
                         setTimeout(resolve, 3500)
@@ -128,7 +128,7 @@
                     won = true
                     
                     message.innerHTML = `You guessed the word in ${writerow} guesses!`
-                    message.style.color = "var(--yellow)"
+                    message.style.color = "rgb(212, 206, 24)"
                     message.hidden = false
                     restart.hidden = false
                 }
@@ -137,7 +137,7 @@
                 writecolumn = 0
                 if (writerow > 5) { // things go here
                     message.innerHTML = `You didn't guess the word, it was ${word}.`
-                    message.style.color = "var(--red)"
+                    message.style.color = "rgb(212, 24, 24)"
                     message.hidden = false
                     restart.hidden = false
                 }
@@ -154,9 +154,7 @@
         }
 
         #message {
-            --yellow: rgb(212, 206, 24);
-            --red: rgb(212, 24, 24);
-            color: var(--yellow);
+            color: rgb(212, 206, 24);
         }
 
         h1, h3 {
@@ -226,27 +224,26 @@
         }
 
         button {
-            --c: 80;
-            background-color: rgb(var(--c), var(--c), var(--c));
+            background-color: rgb(80, 80, 80);
             margin-top: 2vw;
             width: 8vw;
             height: 3vw;
             border: solid;
-            border-color: rgb(calc(var(--c) - 10), calc(var(--c) - 10), calc(var(--c) - 10));
+            border-color: rgb(calc(80 - 10), calc(80 - 10), calc(80 - 10));
             border-width: 0.25vw;
             border-radius: 0.25vw;
             font-size: 1vw;
         }
         button:hover {
-            background-color: rgb(calc(var(--c) - 5), calc(var(--c) - 5), calc(var(--c) - 5));
-            border-color: rgb(calc(var(--c) - 15), calc(var(--c) - 15), calc(var(--c) - 15));
+            background-color: rgb(calc(80 - 5), calc(80 - 5), calc(80 - 5));
+            border-color: rgb(calc(80 - 15), calc(80 - 15), calc(80 - 15));
             border-width: 0.25vw;
             border-radius: 0.25vw;
         }
 
         button:active {
-            background-color: rgb(calc(var(--c) - 20), calc(var(--c) - 20), calc(var(--c) - 20));
-            border-color: rgb(calc(var(--c) - 25), calc(var(--c) - 25), calc(var(--c) - 25 ));
+            background-color: rgb(calc(80 - 20), calc(80 - 20), calc(80 - 20));
+            border-color: rgb(calc(80 - 25), calc(80 - 25), calc(80 - 25 ));
             border-width: 0.25vw;
             border-radius: 0.25vw;
         }
